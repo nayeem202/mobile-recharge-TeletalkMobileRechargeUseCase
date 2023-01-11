@@ -1,16 +1,25 @@
 package net.celloscope.bill.mobileRecharge.domain;
 
+import com.google.gson.GsonBuilder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import net.celloscope.bill.mobileRecharge.shared.ChannelName;
 import net.celloscope.bill.mobileRecharge.shared.ConnectionType;
 import net.celloscope.bill.mobileRecharge.shared.Operator;
+import net.celloscope.bill.mobileRecharge.shared.model.TeletalkTransactionIntermediateStatus;
+import net.celloscope.bill.mobileRecharge.shared.util.Constants;
 
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@ToString
+
+@Data
+@Getter
+@Setter
 public class TeletalkRecharge extends MobileRecharge{
     private Double charge;
     private Double vat;
@@ -38,18 +47,18 @@ public class TeletalkRecharge extends MobileRecharge{
         this.errorMessage = errorMessage;
     }
 
-  /*  @Override
+    @Override
     public String toString() {
         return new GsonBuilder().setPrettyPrinting().create().toJson(this);
-    }*/
+    }
 
-    public boolean isSameRequestWithinTimeBound(List<BanglalinkRecharge> banglalinkRechargeList) {
-        if (banglalinkRechargeList.isEmpty()) return true;
+    public boolean isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
+        if (teletalkRechargeList.isEmpty()) return true;
         Date now = new Date();
         DecimalFormat df = new DecimalFormat("0.00");
-        for (TeletalkRecharge rechargeTransaction : banglalinkRechargeList) {
+        for (TeletalkRecharge rechargeTransaction : teletalkRechargeList) {
             if (!rechargeTransaction.getTransStatus().equals("OK")) continue;
-            long diffInMilliSeconds = now.getTime() - rechargeTransaction.getBanglalinkTransactionDate().getTime();
+            long diffInMilliSeconds = now.getTime() - rechargeTransaction.getTeletalkTransactionDate().getTime();
             float diffInMinutes = TimeUnit.MINUTES.convert(diffInMilliSeconds, TimeUnit.MILLISECONDS);
             diffInMinutes = Float.valueOf(df.format(diffInMinutes));
             System.out.println("+++++++++++++++++ Difference in minutes: " + diffInMinutes);
@@ -59,4 +68,14 @@ public class TeletalkRecharge extends MobileRecharge{
         }
         return true;
     }
+
+ /*   public static boolean isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
+        return Flux.fromIterable(teletalkRechargeList)
+                .filter(transaction -> transaction.getTransStatus().equals("OK"))
+                .map(transaction -> Duration.between(transaction.getTeletalkTransactionDate().toInstant(), Instant.now()).toMinutes())
+                .any(minutes -> minutes < Constants.BANGLALINK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST)
+                .block();
+    }*/
+
+
 }
