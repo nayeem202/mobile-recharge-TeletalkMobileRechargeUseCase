@@ -10,12 +10,15 @@ import net.celloscope.bill.mobileRecharge.shared.ConnectionType;
 import net.celloscope.bill.mobileRecharge.shared.Operator;
 import net.celloscope.bill.mobileRecharge.shared.model.TeletalkTransactionIntermediateStatus;
 import net.celloscope.bill.mobileRecharge.shared.util.Constants;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.text.DecimalFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 
 @Data
 @Getter
@@ -52,7 +55,7 @@ public class TeletalkRecharge extends MobileRecharge{
         return new GsonBuilder().setPrettyPrinting().create().toJson(this);
     }
 
-    public boolean isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
+/*    public boolean isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
         if (teletalkRechargeList.isEmpty()) return true;
         Date now = new Date();
         DecimalFormat df = new DecimalFormat("0.00");
@@ -67,15 +70,13 @@ public class TeletalkRecharge extends MobileRecharge{
             }
         }
         return true;
-    }
+    }*/
 
- /*   public static boolean isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
+    public static boolean isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
         return Flux.fromIterable(teletalkRechargeList)
                 .filter(transaction -> transaction.getTransStatus().equals("OK"))
                 .map(transaction -> Duration.between(transaction.getTeletalkTransactionDate().toInstant(), Instant.now()).toMinutes())
                 .any(minutes -> minutes < Constants.BANGLALINK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST)
                 .block();
-    }*/
-
-
+    }
 }
