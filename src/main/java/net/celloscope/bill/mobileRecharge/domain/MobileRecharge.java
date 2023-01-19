@@ -15,6 +15,7 @@ public class MobileRecharge {
     private Operator operator;
     private ConnectionType connectionType;
     private Integer amount;
+    private String originatorConversationId;
     private String requestId;
     private String traceId;
     private String remarks;

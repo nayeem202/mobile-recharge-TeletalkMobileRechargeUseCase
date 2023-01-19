@@ -1,10 +1,7 @@
 package net.celloscope.bill.mobileRecharge.domain;
 
 import com.google.gson.GsonBuilder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import net.celloscope.bill.mobileRecharge.shared.ChannelName;
 import net.celloscope.bill.mobileRecharge.shared.ConnectionType;
 import net.celloscope.bill.mobileRecharge.shared.Operator;
@@ -23,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Data
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = false)
 public class TeletalkRecharge extends MobileRecharge{
     private Double charge;
     private Double vat;
