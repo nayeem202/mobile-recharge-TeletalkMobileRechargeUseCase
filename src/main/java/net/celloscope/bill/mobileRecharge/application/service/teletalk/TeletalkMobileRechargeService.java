@@ -70,7 +70,7 @@ public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUse
                     try {
                         if (!teletalkRecharge.isSameRequestWithinTimeBound(
                                 teletalkRechargeTransactionListByMobileNoAndAmount(teletalkRecharge.getMobileNo(), teletalkRecharge.getAmount()).block())) {
-                            log.error("Request received within 0.02 minute for requestId: {}", teletalkRecharge.getOriginatorConversationId());
+                            log.error("Request received within 0.02 minute for requestId: {}", teletalkRecharge.getOriginatorConeversionId);
                             saveTeletalkRechargeRequest.setTransStatus(PRE_PROCESS_FAILED);
                             return updateTeletalkMobileRecharge.updateState(saveTeletalkRechargeRequest)
                                     .then(Mono.error(new ExceptionHandlerUtil(HttpStatus.TOO_MANY_REQUESTS, "Request Limit Exceeded.")));
@@ -87,16 +87,11 @@ public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUse
                                         .flatMap(response -> checkResponseStatusUpdateDomain(response, saveMobileRechargeTransactionPreProcessSate)
                                                 .flatMap(updatedRechargeResponseStateUpdatedIntoDomain -> {
                                                     log.info("updatedRechargeResponseStateUpdatedIntoDomain - {}", updatedRechargeResponseStateUpdatedIntoDomain);
-                                                    try {
-                                                        return updateTeletalkMobileRecharge.updateState(updatedRechargeResponseStateUpdatedIntoDomain)
-                                                                .thenReturn(response);
-                                                    } catch (ExceptionHandlerUtil e) {
-                                                        System.out.println(e.getLocalizedMessage());
-                                                    }
-                                                    return null;
+                                                    return updateTeletalkRecharge.updateState(updatedRechargeResponseStateUpdatedIntoDomain)
+                                                            .thenReturn(response);
                                                 })));
                     } catch (ExceptionHandlerUtil e) {
-                        System.out.println(e.getLocalizedMessage());
+                        throw new System.out.println(e.getLocalizedMessage());
                     }
                 });
     }
@@ -136,9 +131,9 @@ public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUse
                 .onErrorMap(e -> new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage())).block();
     }
 
-    private Mono<TeletalkRecharge> checkResponseStatusUpdateDomain(RechargeResponse responseMono, TeletalkRecharge teletalkRecharge) {
+    private Mono<TeletalkRecharge> checkResponseStatusUpdateDomain(Mono<RechargeResponse> responseMono, TeletalkRecharge teletalkRecharge) {
         return responseMono.flatMap(response -> {
-            log.info("Checking Banglalink mobile recharge response {}", response);
+            log.info("Checking teletalk mobile recharge response {}", response);
             if (response.getStatus().equalsIgnoreCase(OK)) {
                 teletalkRecharge.setTransStatus(OK);
                 teletalkRecharge.setTelatalkTransactionId(response.getTransactionId());
