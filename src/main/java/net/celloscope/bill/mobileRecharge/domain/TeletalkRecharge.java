@@ -11,8 +11,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.text.DecimalFormat;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -33,9 +31,8 @@ public class TeletalkRecharge extends MobileRecharge{
     private String errorCode;
     private String errorMessage;
 
-
-    public TeletalkRecharge(String mobileNo, Operator operator, ConnectionType connectionType, Integer amount, String requestId, String traceId, String remarks, String userId, String bankOid, String bankName, ChannelName channelName, Double charge, Double vat, Date teletalkTransactionDate, String transStatus, TeletalkTransactionIntermediateStatus intermediateStatus, String failureReason, String telatalkTransactionId, String currency, String errorCode, String errorMessage) {
-        super(mobileNo, operator, connectionType, amount, requestId, traceId, remarks, userId, bankOid, bankName, channelName);
+    public TeletalkRecharge(String mobileNo, Operator operator, ConnectionType connectionType, Integer amount, String originatorConversationId, String requestId, String traceId, String remarks, String userId, String bankOid, String bankName, ChannelName channelName, Double charge, Double vat, Date teletalkTransactionDate, String transStatus, TeletalkTransactionIntermediateStatus intermediateStatus, String failureReason, String telatalkTransactionId, String currency, String errorCode, String errorMessage) {
+        super(mobileNo, operator, connectionType, amount, originatorConversationId, requestId, traceId, remarks, userId, bankOid, bankName, channelName);
         this.charge = charge;
         this.vat = vat;
         this.teletalkTransactionDate = teletalkTransactionDate;
@@ -46,6 +43,10 @@ public class TeletalkRecharge extends MobileRecharge{
         this.currency = currency;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
+    }
+
+    public TeletalkRecharge() {
+
     }
 
     @Override
@@ -70,11 +71,25 @@ public class TeletalkRecharge extends MobileRecharge{
         return true;
     }*/
 
-    public static boolean isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
+    public Mono<Boolean> isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
+        return Flux.fromIterable(teletalkRechargeList)
+                .filter(rechargeTransaction -> rechargeTransaction.getTransStatus().equals("OK"))
+                .map(rechargeTransaction -> {
+                    long diffInMilliSeconds = new Date().getTime() - rechargeTransaction.getTeletalkTransactionDate().getTime();
+                    return TimeUnit.MINUTES.convert(diffInMilliSeconds, TimeUnit.MILLISECONDS);
+                })
+                .map(diffInMinutes -> Float.valueOf(new DecimalFormat("0.00").format(diffInMinutes)))
+                .any(diffInMinutes -> diffInMinutes < Constants.TELETALK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST);
+            /*    .map(hasMatchingRequest -> !hasMatchingRequest);*/
+    }
+
+
+
+  /*  public static boolean isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
         return Flux.fromIterable(teletalkRechargeList)
                 .filter(transaction -> transaction.getTransStatus().equals("OK"))
                 .map(transaction -> Duration.between(transaction.getTeletalkTransactionDate().toInstant(), Instant.now()).toMinutes())
                 .any(minutes -> minutes < Constants.BANGLALINK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST)
                 .block();
-    }
+    }*/
 }

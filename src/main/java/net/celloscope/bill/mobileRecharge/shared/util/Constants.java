@@ -11,12 +11,12 @@ public class Constants {
     public static final Integer MINIMUM_ALLOWED_AMOUNT = 10;
     public static final Integer MAXIMUM_ALLOWED_AMOUNT = 1000;
     public static final int MAXIMUM_ALLOWED_TIME_FOR_REQUEST = 5;
-    public static final float BANGLALINK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST = 0.02f;
+    public static final float TELETALK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST = 0.02f;
     public static final String TELETALK_SERVICE_UNAVAILABLE = "Teletalk service is unavailable";
     public static final String REQUEST_QUEUED = "Teletalk request is pending";
     public static final String TELETALK_SERVICE_RESPONSE_NOT_FOUND = "Response unavailable from Robi service";
     public static final String RECONCILE_MESSAGE = "Telatalk request is waiting for reconcile";
-    public static final String Teletalk_PROCESS_UNSECCESSFUL = "Sorry, recharge to teletalk account was unsuccessful";
+    public static final String TELETALK_PROCESS_UNSECCESSFUL = "Sorry, recharge to teletalk account was unsuccessful";
     public static final String INTERNAL_SERVER_ERROR = "500";
     public static final String TIME_OUT = "Time out occurred";
     public static final String DATA_NOT_FOUND = "No Data found";

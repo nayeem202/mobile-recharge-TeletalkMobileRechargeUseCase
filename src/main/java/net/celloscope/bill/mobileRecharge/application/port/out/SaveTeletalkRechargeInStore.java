@@ -5,6 +5,5 @@ import net.celloscope.bill.mobileRecharge.shared.util.ExceptionHandlerUtil;
 import reactor.core.publisher.Flux;
 
 public interface SaveTeletalkRechargeInStore {
-    //TeletalkRecharge save(TeletalkRecharge rechargeTransaction) throws ExceptionHandlerUtil;
     Flux<TeletalkRecharge> save(TeletalkRecharge rechargeTransaction) throws ExceptionHandlerUtil;
 }

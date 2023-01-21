@@ -25,4 +25,6 @@ public class MobileRecharge {
     private ChannelName channelName;
 
 
+    public MobileRecharge(String mobileNo, Operator operator, ConnectionType connectionType, Integer amount, String requestId, String traceId, String remarks, String userId, String bankOid, String bankName, ChannelName channelName) {
+    }
 }
