@@ -8,7 +8,6 @@ import net.celloscope.bill.mobileRecharge.shared.Operator;
 import net.celloscope.bill.mobileRecharge.shared.model.TeletalkTransactionIntermediateStatus;
 import net.celloscope.bill.mobileRecharge.shared.util.Constants;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.text.DecimalFormat;
 import java.util.Date;
@@ -71,7 +70,7 @@ public class TeletalkRecharge extends MobileRecharge{
         return true;
     }*/
 
-    public Mono<Boolean> isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
+    public boolean isSameRequestWithinTimeBound(List<TeletalkRecharge> teletalkRechargeList) {
         return Flux.fromIterable(teletalkRechargeList)
                 .filter(rechargeTransaction -> rechargeTransaction.getTransStatus().equals("OK"))
                 .map(rechargeTransaction -> {
