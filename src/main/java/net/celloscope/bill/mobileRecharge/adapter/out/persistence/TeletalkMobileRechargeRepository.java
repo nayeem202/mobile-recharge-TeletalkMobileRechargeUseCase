@@ -20,7 +20,7 @@ public interface TeletalkMobileRechargeRepository extends JpaRepository<Banglali
 
 @Repository
 public interface TeletalkMobileRechargeRepository extends ReactiveCrudRepository<TeletalkMobileRechargeEntity,Object> {
-    Flux<TeletalkMobileRechargeEntity> findByMobileNoAndAmount(String mobileNo, Double teletalkRechargeAmount);
+    Flux<List<TeletalkMobileRechargeEntity>> findByMobileNoAndAmount(String mobileNo, Double teletalkRechargeAmount);
     @NotFound(action = NotFoundAction.IGNORE)
     Mono<TeletalkMobileRechargeEntity> findByOriginatorConversationId(String originatorConversationId);
 }

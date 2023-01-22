@@ -21,14 +21,16 @@ public class TeletalkPersistenceAdapterInStore implements SaveTeletalkRechargeIn
 
     private final TeletalkMobileRechargeRepository teletalkMobileRechargeRepository;
     private final TeletalkTransactionMapper teletalkTransactionMapper;
-
-
     @Override
-    public Mono<List<TeletalkRecharge>> findByMobileNoAndAmount(String mobileNo, Double amount) {
-        Flux<TeletalkMobileRechargeEntity> rechargeEntityFlux = teletalkMobileRechargeRepository.findByMobileNoAndAmount(mobileNo, amount);
-        return rechargeEntityFlux.map(rechargeEntity -> teletalkTransactionMapper.mapToDomainEntity(rechargeEntity));
+    public Flux<List<TeletalkRecharge>> findByMobileNoAndAmount(String mobileNo, Double amount) {
+        Flux<List<TeletalkMobileRechargeEntity>> rechargeEntityFlux = teletalkMobileRechargeRepository.findByMobileNoAndAmount(mobileNo, amount);
+        Flux<List<TeletalkRecharge>> teletalkRecharge = rechargeEntityFlux.map(rechargeEntity -> {
+             teletalkTransactionMapper.mapJpaListToDomainEntityList(rechargeEntity);
+                    return teletalkRecharge;
+                }
+        );
+        return teletalkRecharge;
     }
-
     @Override
     public Flux<TeletalkRecharge> save(TeletalkRecharge rechargeTransaction) throws ExceptionHandlerUtil {
         Provider<TeletalkMobileRechargeEntity> teletalkMobileRechargeEntityProvider = provider -> new TeletalkMobileRechargeEntity();
@@ -41,7 +43,13 @@ public class TeletalkPersistenceAdapterInStore implements SaveTeletalkRechargeIn
         Mono<TeletalkMobileRechargeEntity> rechargeEntityMono = teletalkMobileRechargeRepository.findByOriginatorConversationId(rechargeTransaction.getOriginatorConversationId())
                 .flatMap(rechargeEntityProvider -> teletalkMobileRechargeRepository.save(teletalkTransactionMapper.mapToJpaEntity(rechargeEntityProvider, rechargeTransaction)));
 
-        return rechargeEntityMono.map(rechargeEntity -> teletalkTransactionMapper.mapToDomainEntity(rechargeEntity));
+        return rechargeEntityMono.map(rechargeEntity -> {
+            try {
+                return teletalkTransactionMapper.mapToDomainEntity(rechargeEntity);
+            } catch (ExceptionHandlerUtil e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
 

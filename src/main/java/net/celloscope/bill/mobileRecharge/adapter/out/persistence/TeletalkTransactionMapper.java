@@ -59,7 +59,7 @@ public class TeletalkTransactionMapper {
                     TeletalkRecharge teletalkRecharge = new TeletalkRecharge();
                     BeanUtils.copyProperties(banglalinkMobileRechargeEntity, teletalkRecharge);
                     try {
-                        teletalkRecharge.setIntermediateStatus(objectMapper.readValue(banglalinkMobileRechargeEntity.getIntermediateStatus(), BanglalinkTransactionIntermediateStatus.class));
+                        teletalkRecharge.setIntermediateStatus(objectMapper.readValue(banglalinkMobileRechargeEntity.getIntermediateStatus(), TeletalkTransactionIntermediateStatus.class));
                     } catch (JsonProcessingException e) {
                         log.error("Error occurred during converting intermediate status to domain object", e);
                         try {

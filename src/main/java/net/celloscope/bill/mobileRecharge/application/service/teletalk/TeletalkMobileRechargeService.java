@@ -26,7 +26,7 @@ import java.util.List;
 import static net.celloscope.bill.mobileRecharge.shared.util.Constants.*;
 
 
-@RequiredArgsConstructor
+
 @Slf4j
 @Service
 public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUseCase {

@@ -78,7 +78,7 @@ public class TeletalkRecharge extends MobileRecharge{
                     return TimeUnit.MINUTES.convert(diffInMilliSeconds, TimeUnit.MILLISECONDS);
                 })
                 .map(diffInMinutes -> Float.valueOf(new DecimalFormat("0.00").format(diffInMinutes)))
-                .any(diffInMinutes -> diffInMinutes < Constants.TELETALK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST);
+                .any(diffInMinutes -> diffInMinutes < Constants.TELETALK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST).block();
             /*    .map(hasMatchingRequest -> !hasMatchingRequest);*/
     }
 

@@ -1,6 +1,7 @@
 package net.celloscope.bill.mobileRecharge.adapter.out.persistence;
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -20,7 +21,7 @@ public class TeletalkMobileRechargeEntity {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "robimobilerechargeoid", updatable = false, nullable = false)
+    @Column(name = "teletalkmobilerechargeoid", updatable = false, nullable = false)
     private String teletalkMobileRechargeOid;
     @Column(name = "teletalkrechargeamount")
     private Double amount;
