@@ -3,9 +3,9 @@ package net.celloscope.bill.mobileRecharge.adapter.out.persistence;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import java.util.Date;
@@ -16,7 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "teletalkmobilerecharge")
+@Table(name = "robimobilerecharge")
 public class TeletalkMobileRechargeEntity {
     @Id
     @GeneratedValue(generator = "UUID")

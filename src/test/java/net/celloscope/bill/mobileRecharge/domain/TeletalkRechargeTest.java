@@ -7,6 +7,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -16,23 +18,36 @@ public class TeletalkRechargeTest {
     @Test
     void test() {
         TeletalkRecharge tl = new TeletalkRecharge();
-        Mono<Boolean> res = tl.isSameRequestWithinTimeBound((List<TeletalkRecharge>) buildRechargeListOfCurrentTime());
+        Mono<Boolean> res = tl.isSameRequestWithinTimeBound(buildRechargeListOfCurrentTime());
         StepVerifier.create(res)
-                .expectNext(false)
+                .expectNext(true)
                 .verifyComplete();
 
     }
 
-    public Flux<TeletalkRecharge> buildRechargeListOfCurrentTime() {
-        return Flux.fromIterable(List.of(
-              new TeletalkRecharge(null, null, null, null, null, null, null, null, null, null, null, null, null, null, new Date() ,null, null, null, null, null, null, null),
-                new TeletalkRecharge(null, null, null, null, null, null, null, null, null, null, null, null, null, null, new Date(), null, null, null, null, null, null, null)
-        ));
+    @Test
+    void test2(){
+        TeletalkRecharge tl = new TeletalkRecharge();
+        Mono<Boolean> res = tl.isSameRequestWithinTimeBound(buildRechargeListForLastOneMinute());
     }
 
-    /*public Mono<TeletalkRecharge> buildRechargeListOfCurrentTime() {
-        return Mono.just(new TeletalkRecharge(null, null, null, null, null, null, null, null, null, null, null, null, null, null, new Date() ,null, null, null, null, null, null, null));
-    }*/
 
 
-}
+    public Flux<List<TeletalkRecharge>> buildRechargeListOfCurrentTime() {
+        List<TeletalkRecharge> rechargeList = List.of(
+                new TeletalkRecharge(null, null, null, null, null, null, null, null, null, null, null, null, null, null, new Date(), null, null, null, null, null, null, null),
+                new TeletalkRecharge(null, null, null, null, null, null, null, null, null, null, null, null, null, null, new Date(), null, null, null, null, null, null, null)
+        );
+        return Flux.fromIterable(List.of(rechargeList));
+    }
+
+    public Flux<List<TeletalkRecharge>> buildRechargeListForLastOneMinute() {
+        List<TeletalkRecharge> rechargeList = List.of(
+                new TeletalkRecharge(null, null, null, null, null, null, null, null, null, null, null, null, null, null, new Date(System.currentTimeMillis() - 60 * 1000), null, null, null, null, null, null, null)
+        );
+        return Flux.fromIterable(List.of(rechargeList));
+    }
+
+
+
+    }

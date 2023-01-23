@@ -1,3 +1,4 @@
+/*
 package net.celloscope.bill.mobileRecharge.adapter.out.persistence;
 
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,10 @@ public class TeletalkPersistenceAdapterInStore implements SaveTeletalkRechargeIn
     @Override
     public Flux<List<TeletalkRecharge>> findByMobileNoAndAmount(String mobileNo, Double amount) {
         Flux<List<TeletalkMobileRechargeEntity>> rechargeEntityFlux = teletalkMobileRechargeRepository.findByMobileNoAndAmount(mobileNo, amount);
-        Flux<List<TeletalkRecharge>> teletalkRecharge = rechargeEntityFlux.map(rechargeEntity -> {
+      return rechargeEntityFlux.map(rechargeEntity -> {
              teletalkTransactionMapper.mapJpaListToDomainEntityList(rechargeEntity);
-                    return teletalkRecharge;
-                }
+      }
         );
-        return teletalkRecharge;
     }
     @Override
     public Flux<TeletalkRecharge> save(TeletalkRecharge rechargeTransaction) throws ExceptionHandlerUtil {
@@ -39,10 +38,9 @@ public class TeletalkPersistenceAdapterInStore implements SaveTeletalkRechargeIn
     }
 
     @Override
-    public Mono<TeletalkRecharge> updateState(TeletalkRecharge rechargeTransaction) {
+    public <Mono<TeletalkRecharge> Mono<Mono<net.celloscope.bill.mobileRecharge.domain.TeletalkRecharge>> updateState(TeletalkRecharge rechargeTransaction) {
         Mono<TeletalkMobileRechargeEntity> rechargeEntityMono = teletalkMobileRechargeRepository.findByOriginatorConversationId(rechargeTransaction.getOriginatorConversationId())
                 .flatMap(rechargeEntityProvider -> teletalkMobileRechargeRepository.save(teletalkTransactionMapper.mapToJpaEntity(rechargeEntityProvider, rechargeTransaction)));
-
         return rechargeEntityMono.map(rechargeEntity -> {
             try {
                 return teletalkTransactionMapper.mapToDomainEntity(rechargeEntity);
@@ -54,3 +52,4 @@ public class TeletalkPersistenceAdapterInStore implements SaveTeletalkRechargeIn
 
 
 }
+*/
