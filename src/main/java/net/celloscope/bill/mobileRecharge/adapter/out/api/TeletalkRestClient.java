@@ -28,7 +28,7 @@ public class TeletalkRestClient {
             .defaultHeader(HttpHeaders.ACCEPT_CHARSET, "UTF-8")
             .build();
 
-    public Mono<TeletalkMobileRechargeResponse> getTeletalkRechargeResponse(TeletalkMobileRechargeRequest request) throws JAXBException {
+   /* public Mono<TeletalkMobileRechargeResponse> getTeletalkRechargeResponse(TeletalkMobileRechargeRequest request) throws JAXBException {
         log.info("Requesting recharge to url: {}", TELETALK_RECHARGE_BASE_URL);
         String xmlPayload = String.valueOf(convertRequestToXMLString(request));
         log.info("Prepaid Recharge Request Sent to Teletalk: {}", xmlPayload);
@@ -60,7 +60,7 @@ public class TeletalkRestClient {
                     return response;
                 });
     }
-
+*/
 
     private Mono<String> convertRequestToXMLString(TeletalkMobileRechargeRequest request) throws JAXBException {
         StringWriter writer = new StringWriter();
@@ -93,7 +93,6 @@ public class TeletalkRestClient {
             }
         }).onErrorMap(JAXBException.class, ex -> new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, RESPONSE_UNMARSHALLING_ERROR));
     }
-
 
 
     private Mono<String> getTeletalkTimeoutResponse() {

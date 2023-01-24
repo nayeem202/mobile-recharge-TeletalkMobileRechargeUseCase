@@ -66,7 +66,10 @@ public class TeletalkRecharge extends MobileRecharge{
                     Long diffInMinutes = TimeUnit.MINUTES.convert(diffInMilliSeconds, TimeUnit.MILLISECONDS);
                     //log.info("++ Difference in minutes: {}", diffInMinutes);
                     //log.info();
-                    return diffInMinutes < Constants.TELETALK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST;
+                     if(diffInMinutes < Constants.TELETALK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST){
+                        return false;
+                    };
+                    return true;
                 })
                 .defaultIfEmpty(true)
                 .any(withinTimeBound -> !withinTimeBound)
