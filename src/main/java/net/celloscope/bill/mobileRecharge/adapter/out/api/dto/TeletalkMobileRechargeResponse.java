@@ -11,8 +11,6 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @ToString
 @XmlRootElement(name = "COMMAND")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -30,4 +28,53 @@ public class TeletalkMobileRechargeResponse {
     private String TXNID;
 //    @XmlElement
     private String MESSAGE;
+
+
+    public String getTYPE() {
+        return TYPE;
+    }
+
+    public int getTXNSTATUS() {
+        return TXNSTATUS;
+    }
+
+    public Date getDATE() {
+        return DATE;
+    }
+
+    public String getEXTREFNUM() {
+        return EXTREFNUM;
+    }
+
+    public String getTXNID() {
+        return TXNID;
+    }
+
+    public String getMESSAGE() {
+        return MESSAGE;
+    }
+
+    public void setTYPE(String TYPE) {
+        this.TYPE = TYPE;
+    }
+
+    public void setTXNSTATUS(int TXNSTATUS) {
+        this.TXNSTATUS = TXNSTATUS;
+    }
+
+    public void setDATE(Date DATE) {
+        this.DATE = DATE;
+    }
+
+    public void setEXTREFNUM(String EXTREFNUM) {
+        this.EXTREFNUM = EXTREFNUM;
+    }
+
+    public void setTXNID(String TXNID) {
+        this.TXNID = TXNID;
+    }
+
+    public void setMESSAGE(String MESSAGE) {
+        this.MESSAGE = MESSAGE;
+    }
 }
