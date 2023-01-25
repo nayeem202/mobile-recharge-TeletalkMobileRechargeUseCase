@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
-
 import javax.xml.bind.*;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -31,7 +30,6 @@ import static net.celloscope.bill.mobileRecharge.shared.util.Constants.*;
 @Component
 public class TeletalkRestClient {
 
-
     private String TELETALK_RECHARGE_BASE_URL;
 
     WebClient client = WebClient.builder()
@@ -40,10 +38,46 @@ public class TeletalkRestClient {
             .defaultHeader(HttpHeaders.ACCEPT_CHARSET, "UTF-8")
             .build();
 
-    public Mono<TeletalkMobileRechargeResponse> getTeletalkRechargeResponse(TeletalkMobileRechargeRequest request) throws JAXBException {
-        log.info("Requesting recharge to url: {}", TELETALK_RECHARGE_BASE_URL);
-        String xmlPayload = String.valueOf(convertRequestToXMLString(request));
+    public Mono<TeletalkMobileRechargeResponse> getTeletalkRechargeResponse(TeletalkMobileRechargeRequest request)  {
+       log.info("Requesting recharge to url: {}", TELETALK_RECHARGE_BASE_URL);
+        String xmlPayload = null;
+        try {
+            xmlPayload = String.valueOf(convertRequestToXMLString(request));
+        } catch (JAXBException e) {
+            log.error("Error unmarshalling response: {}", e.getMessage());
+            return Mono.error(e);
+        }
         log.info("Prepaid Recharge Request Sent to Teletalk: {}", xmlPayload);
+
+        return client.post()
+                .uri(TELETALK_RECHARGE_BASE_URL)
+                .body(Mono.just(xmlPayload), String.class)
+                .retrieve()
+                .bodyToMono(String.class)
+                .timeout(Duration.ofSeconds(60))
+                .doOnError(WebClientRequestException.class, ex -> log.error("{}", ex.getMessage()))
+                .doOnError(RuntimeException.class, ex -> log.error("{}", ex.getMessage()))
+                .onErrorResume(WebClientRequestException.class, ex -> (Mono<? extends String>) getTeletalkTimeoutResponse())
+                .onErrorResume(RuntimeException.class, ex -> (Mono<? extends String>) getTeletalkRuntimeExceptionResponse())
+                .flatMap(responseXml -> {
+                    log.info("Response Sent from Teletalk: {}", responseXml);
+                    responseXml = responseXml.replace("<!DOCTYPE COMMAND PUBLIC \"-//Ocam//DTD XML Command 1.0//EN\" \"xml/command.dtd\">","");
+                    try {
+                        TeletalkMobileRechargeResponse response = unmarshalResponse(responseXml).block();
+                        log.info("Unmarshal Response from Teletalk: {}", response);
+                        if (response != null && response.getTXNSTATUS() == 408)
+                            new ExceptionHandlerUtil(HttpStatus.REQUEST_TIMEOUT, TIME_OUT);
+                        else if (response != null && response.getTXNSTATUS() == 500)
+                            new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR);
+                        return Mono.just(response);
+                    } catch (JAXBException e) {
+                        log.error("Error unmarshalling response: {}", e.getMessage());
+                        return Mono.error(e);
+                    }
+                });
+
+
+    /*
 
         return client.post()
                 .uri(TELETALK_RECHARGE_BASE_URL)
@@ -60,9 +94,9 @@ public class TeletalkRestClient {
                     responseXml = responseXml.replace("<!DOCTYPE COMMAND PUBLIC \"-//Ocam//DTD XML Command 1.0//EN\" \"xml/command.dtd\">","");
                     TeletalkMobileRechargeResponse response = null;
                     try {
-                        response = unmarshalResponse(responseXml).block();
+                        response = unmarshalResponse(responseXml);
                     } catch (JAXBException e) {
-                        throw new RuntimeException(e);
+                        System.out.println(e.getMessage());
                     }
                     log.info("Unmarshal Response from Teletalk: {}", response);
                     if (response != null && response.getTXNSTATUS() == 408)
@@ -70,8 +104,28 @@ public class TeletalkRestClient {
                     else if (response != null && response.getTXNSTATUS() == 500)
                        new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR);
                     return response;
-                });
+                });*/
     }
+
+
+/*    private Mono<String> convertRequestToXMLString(TeletalkMobileRechargeRequest request)  {
+        StringWriter writer = new StringWriter();
+        writer.append("<?xml version=\"1.0\"?>");
+        JAXBContext context = JAXBContext.newInstance(TeletalkMobileRechargeRequest.class);
+        Marshaller marshaller = context.createMarshaller();
+
+        return Mono.just(
+            {
+                marshaller.marshal(request, writer);
+                return writer.toString();
+            } catch (JAXBException e) {
+                log.error("Marshalling Error: {}", e.getMessage());
+                throw new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, REQUEST_MARSHALLING_ERROR);
+
+            }
+        });
+                //.onErrorMap(JAXBException.class, ex -> new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, REQUEST_MARSHALLING_ERROR));
+    }*/
 
     private Mono<String> convertRequestToXMLString(TeletalkMobileRechargeRequest request) throws JAXBException {
         StringWriter writer = new StringWriter();
@@ -92,14 +146,15 @@ public class TeletalkRestClient {
 
 
 
-    private Mono<TeletalkMobileRechargeResponse> unmarshalResponse(String xmlResponse) throws JAXBException {
+
+    public Mono<TeletalkMobileRechargeResponse> unmarshalResponse(String xmlResponse) throws  JAXBException {
         JAXBContext context = JAXBContext.newInstance(TeletalkMobileRechargeResponse.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         return Mono.fromCallable(() -> {
             try {
                 return (TeletalkMobileRechargeResponse) unmarshaller.unmarshal(new StringReader(xmlResponse));
             } catch (JAXBException e) {
-                //log.error("Unmarshall Error: {}", e.getMessage());
+                log.error("Unmarshall Error: {}", e.getMessage());
                 throw new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, RESPONSE_UNMARSHALLING_ERROR);
             }
         }).onErrorMap(JAXBException.class, ex -> new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, RESPONSE_UNMARSHALLING_ERROR));
