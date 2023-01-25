@@ -9,15 +9,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-/*
-@Repository
-public interface TeletalkMobileRechargeRepository extends JpaRepository<BanglalinkMobileRechargeEntity,Object> {
-    List<BanglalinkMobileRechargeEntity> findByMobileNoAndAmount(String mobileNo, Double robiRechargeAmount);
-    @NotFound(action = NotFoundAction.IGNORE)
-    BanglalinkMobileRechargeEntity findByOriginatorConversationId(String originatorConversationId);
-}
-*/
-
 @Repository
 public interface TeletalkMobileRechargeRepository extends ReactiveCrudRepository<TeletalkMobileRechargeEntity,Object> {
     Flux<List<TeletalkMobileRechargeEntity>> findByMobileNoAndAmount(String mobileNo, Double teletalkRechargeAmount);

@@ -51,7 +51,7 @@ public class TeletalkMobileRechargeEntity {
     private String requestId;
 
     @Column(name = "teltalktransactionid")
-    private String robiTransactionId;
+    private String teletalkTransactionId;
 
     @Column(name = "remarks")
     private String remarks;

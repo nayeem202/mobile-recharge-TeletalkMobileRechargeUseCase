@@ -13,25 +13,20 @@ import java.time.format.DateTimeFormatter;
 
 @ExtendWith(SpringExtension.class)
 @Slf4j
-
 class TeletalkMobileRechargeAdapterTest {
     @Test
     void givenDateTimeFormatterSample_shouldReturnDateTimeInThatSpecificFormat() {
-
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         //when
         Mono<String> formattedLocalDateTimeMono = Mono.fromCallable(() -> LocalDateTime.now().format(dateTimeFormatter));
-
-//then
+        //then
         Mono<String> targetDateTimeMono = Mono.fromCallable(() -> LocalDateTime.now().format(dateTimeFormatter));
-
         StepVerifier.create(formattedLocalDateTimeMono.zipWith(targetDateTimeMono, (formatted, target) -> {
                    //log.info("formatted {} || targeted {}", formatted, target);
+                    log.info("formatted target");
                     return formatted.equals(target);
                 }))
                 .expectNext(true)
                 .verifyComplete();
-
-
     }
 }

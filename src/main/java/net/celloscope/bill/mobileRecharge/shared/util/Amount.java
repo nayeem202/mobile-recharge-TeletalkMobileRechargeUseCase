@@ -12,7 +12,7 @@ public enum Amount {
     TELETALK_POSTPAID_MINIMUM("20"),
     TELETALK_POSTPAID_MAXIMUM("100000");
 
-    private String value;
+    private final String value;
 
     Amount(String value) {
         this.value = value;

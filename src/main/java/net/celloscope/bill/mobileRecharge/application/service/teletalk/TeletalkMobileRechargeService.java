@@ -1,4 +1,4 @@
-/*
+
 package net.celloscope.bill.mobileRecharge.application.service.teletalk;
 
 import lombok.RequiredArgsConstructor;
@@ -18,17 +18,12 @@ import net.celloscope.bill.mobileRecharge.shared.util.ExceptionHandlerUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import static net.celloscope.bill.mobileRecharge.shared.util.Constants.*;
-
-*/
-/**//*
-
 
 @Slf4j
 @Service
@@ -74,7 +69,7 @@ public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUse
                     }
                     try {
                         if (!teletalkRecharge.isSameRequestWithinTimeBound(
-                                teletalkRechargeTransactionListByMobileNoAndAmount(teletalkRecharge.getMobileNo(), teletalkRecharge.getAmount()).block())) {
+                                teletalkRechargeTransactionListByMobileNoAndAmount(teletalkRecharge.getMobileNo(), teletalkRecharge.getAmount()))) {
                             log.error("Request received within 0.02 minute for requestId: {}", teletalkRecharge.getOriginatorConversationId());
                             saveTeletalkRechargeRequest.setTransStatus(PRE_PROCESS_FAILED);
                             return updateTeletalkMobileRecharge.updateState(saveTeletalkRechargeRequest)
@@ -191,7 +186,7 @@ public Mono<RechargeResponse> recharge(RechargeRequest request) throws Exception
 
 
 
-    private Mono<List<TeletalkRecharge>> teletalkRechargeTransactionListByMobileNoAndAmount(String mobileNo, Integer amount) throws ExceptionHandlerUtil {
+    private Flux<List<TeletalkRecharge>> teletalkRechargeTransactionListByMobileNoAndAmount(String mobileNo, Integer amount) throws ExceptionHandlerUtil {
         log.info("Getting MobileRecharge data for mobile no: {}, amount: {}", mobileNo, amount);
         return loadTeletalkMobileRecharge.findByMobileNoAndAmount(mobileNo, Double.valueOf(amount));
     }
@@ -227,4 +222,4 @@ public Mono<RechargeResponse> recharge(RechargeRequest request) throws Exception
 
 
 }
-*/
+

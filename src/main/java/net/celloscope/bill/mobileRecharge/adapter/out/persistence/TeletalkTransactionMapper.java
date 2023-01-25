@@ -8,6 +8,7 @@ import net.celloscope.bill.mobileRecharge.domain.TeletalkRecharge;
 import net.celloscope.bill.mobileRecharge.shared.model.TeletalkTransactionIntermediateStatus;
 import net.celloscope.bill.mobileRecharge.shared.util.ExceptionHandlerUtil;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.Provider;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -40,18 +41,22 @@ public class TeletalkTransactionMapper {
 
 
   /*  public Mono<TeletalkMobileRechargeEntity> mapToJpaEntity(Provider<TeletalkMobileRechargeEntity> teletalkMobileRechargeEntityProvider, TeletalkRecharge teletalkRecharge) throws ExceptionHandlerUtil {
-        return Mono.fromCallable(() -> {
+         Mono.fromCallable(() -> {
             log.info("banglalinkRecharge mapToJpaEntity - {}", teletalkRecharge);
 
             modelMapper.typeMap(TeletalkRecharge.class, TeletalkMobileRechargeEntity.class).setProvider(teletalkMobileRechargeEntityProvider);
-            TeletalkMobileRechargeEntity banglalinkMobileRechargeEntity = modelMapper.map(teletalkRecharge, TeletalkMobileRechargeEntity.class);
+            TeletalkMobileRechargeEntity teletalkMobileRechargeEntity = modelMapper.map(teletalkRecharge, TeletalkMobileRechargeEntity.class);
 
-            banglalinkMobileRechargeEntity.setCreatedOn(banglalinkMobileRechargeEntity.getCreatedOn() == null ? Timestamp.valueOf(LocalDateTime.now()) : banglalinkMobileRechargeEntity.getCreatedOn());
-            banglalinkMobileRechargeEntity.setEditedOn(Timestamp.valueOf(LocalDateTime.now()));
-            banglalinkMobileRechargeEntity.setCreatedBy(teletalkRecharge.getUserId());
-
-        }}
-*/
+            teletalkMobileRechargeEntity.setCreatedOn(teletalkMobileRechargeEntity.getCreatedOn() == null ? Timestamp.valueOf(LocalDateTime.now()) : teletalkMobileRechargeEntity.getCreatedOn());
+            teletalkMobileRechargeEntity.setEditedOn(Timestamp.valueOf(LocalDateTime.now()));
+            teletalkMobileRechargeEntity.setCreatedBy(teletalkRecharge.getUserId());
+            teletalkMobileRechargeEntity.setTeletalkTransactionDate(teletalkRecharge.getTeletalkTransactionDate() ==null ? null: teletalkRecharge.getTeletalkTransactionDate());
+            teletalkMobileRechargeEntity.setTeletalkTransactionId(teletalkRecharge.getTelatalkTransactionId());
+            teletalkMobileRechargeEntity.setTransStatus(objectMapper.writeValueAsString(teletalkRecharge.getIntermediateStatus()));
+            return teletalkRecharge;
+            );
+        });
+    }*/
 
     public Flux<TeletalkRecharge> mapJpaListToDomainEntityList(List<TeletalkMobileRechargeEntity> teletalkMobileRechargeEntityList) {
         return Flux.fromIterable(teletalkMobileRechargeEntityList)
@@ -71,7 +76,4 @@ public class TeletalkTransactionMapper {
                     return teletalkRecharge;
                 });
     }
-
-
-
 }

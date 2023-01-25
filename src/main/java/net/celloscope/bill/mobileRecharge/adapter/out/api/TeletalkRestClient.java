@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
+
 import javax.xml.bind.*;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -30,6 +31,7 @@ import static net.celloscope.bill.mobileRecharge.shared.util.Constants.*;
 @Component
 public class TeletalkRestClient {
 
+
     private String TELETALK_RECHARGE_BASE_URL;
 
     WebClient client = WebClient.builder()
@@ -38,12 +40,13 @@ public class TeletalkRestClient {
             .defaultHeader(HttpHeaders.ACCEPT_CHARSET, "UTF-8")
             .build();
 
-    public Mono<TeletalkMobileRechargeResponse> getTeletalkRechargeResponse(TeletalkMobileRechargeRequest request)  {
+    public Mono<TeletalkMobileRechargeResponse> getTeletalkRechargeResponse(TeletalkMobileRechargeRequest request) {
        log.info("Requesting recharge to url: {}", TELETALK_RECHARGE_BASE_URL);
         String xmlPayload = null;
         try {
             xmlPayload = String.valueOf(convertRequestToXMLString(request));
         } catch (JAXBException e) {
+            new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, RESPONSE_UNMARSHALLING_ERROR);
             log.error("Error unmarshalling response: {}", e.getMessage());
             return Mono.error(e);
         }
@@ -59,6 +62,7 @@ public class TeletalkRestClient {
                 .doOnError(RuntimeException.class, ex -> log.error("{}", ex.getMessage()))
                 .onErrorResume(WebClientRequestException.class, ex -> (Mono<? extends String>) getTeletalkTimeoutResponse())
                 .onErrorResume(RuntimeException.class, ex -> (Mono<? extends String>) getTeletalkRuntimeExceptionResponse())
+
                 .flatMap(responseXml -> {
                     log.info("Response Sent from Teletalk: {}", responseXml);
                     responseXml = responseXml.replace("<!DOCTYPE COMMAND PUBLIC \"-//Ocam//DTD XML Command 1.0//EN\" \"xml/command.dtd\">","");
@@ -106,8 +110,6 @@ public class TeletalkRestClient {
                     return response;
                 });*/
     }
-
-
 /*    private Mono<String> convertRequestToXMLString(TeletalkMobileRechargeRequest request)  {
         StringWriter writer = new StringWriter();
         writer.append("<?xml version=\"1.0\"?>");
@@ -138,7 +140,7 @@ public class TeletalkRestClient {
                 marshaller.marshal(request, writer);
                 return writer.toString();
             } catch (JAXBException e) {
-                //log.error("Marshalling Error: {}", e.getMessage());
+                log.error("Marshalling Error: {}", e.getMessage());
                 throw new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, REQUEST_MARSHALLING_ERROR);
             }
         }).onErrorMap(JAXBException.class, ex -> new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, REQUEST_MARSHALLING_ERROR));
