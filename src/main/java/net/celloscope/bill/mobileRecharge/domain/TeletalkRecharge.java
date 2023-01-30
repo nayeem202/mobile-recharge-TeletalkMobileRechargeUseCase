@@ -1,7 +1,7 @@
 package net.celloscope.bill.mobileRecharge.domain;
-
 import com.google.gson.GsonBuilder;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import net.celloscope.bill.mobileRecharge.shared.ChannelName;
 import net.celloscope.bill.mobileRecharge.shared.ConnectionType;
 import net.celloscope.bill.mobileRecharge.shared.Operator;
@@ -9,15 +9,13 @@ import net.celloscope.bill.mobileRecharge.shared.model.TeletalkTransactionInterm
 import net.celloscope.bill.mobileRecharge.shared.util.Constants;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 
+@Slf4j
 @Data
 @Getter
 @Setter
@@ -64,8 +62,7 @@ public class TeletalkRecharge extends MobileRecharge{
                     if (rechargeTransaction.getTeletalkTransactionDate() == null) return true;
                     Long diffInMilliSeconds = new Date().getTime() - rechargeTransaction.getTeletalkTransactionDate().getTime();
                     Long diffInMinutes = TimeUnit.MINUTES.convert(diffInMilliSeconds, TimeUnit.MILLISECONDS);
-                    //log.info("++ Difference in minutes: {}", diffInMinutes);
-                    //log.info();
+                    log.info("++ Difference in minutes: {}", diffInMinutes);
                      if(diffInMinutes < Constants.TELETALK_MAXIMUM_ALLOWED_TIME_FOR_REQUEST){
                         return false;
                     }

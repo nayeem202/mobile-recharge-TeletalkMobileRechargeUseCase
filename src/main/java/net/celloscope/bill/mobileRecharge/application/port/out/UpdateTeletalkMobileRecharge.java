@@ -5,5 +5,5 @@ import net.celloscope.bill.mobileRecharge.shared.util.ExceptionHandlerUtil;
 import reactor.core.publisher.Mono;
 
 public interface UpdateTeletalkMobileRecharge {
-    Mono<Mono<TeletalkRecharge>> updateState(TeletalkRecharge rechargeTransaction) throws ExceptionHandlerUtil;
+    Mono<TeletalkRecharge> updateState(TeletalkRecharge rechargeTransaction) throws ExceptionHandlerUtil;
 }

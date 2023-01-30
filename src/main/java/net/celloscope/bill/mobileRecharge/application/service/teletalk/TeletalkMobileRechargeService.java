@@ -1,7 +1,7 @@
 
 package net.celloscope.bill.mobileRecharge.application.service.teletalk;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.celloscope.bill.mobileRecharge.application.port.in.dto.RechargeRequest;
 import net.celloscope.bill.mobileRecharge.application.port.in.dto.RechargeResponse;
@@ -27,10 +27,9 @@ import static net.celloscope.bill.mobileRecharge.shared.util.Constants.*;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUseCase {
 
-    //private final LoadTeletalkMobileRecharge loadTeletalkMobileRecharge;
-    //private final UpdateTeletalkMobileRecharge updateTeletalkMobileRecharge;
 
     private final ModelMapper mapper;
     private final SaveTeletalkRechargeInStore saveTeletalkRechargeInstore;
@@ -39,6 +38,7 @@ public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUse
     private final LoadTeletalkMobileRecharge loadTeletalkMobileRecharge;
 
 
+/*
   public TeletalkMobileRechargeService(ModelMapper mapper, TeletalkRecharge teletalkRecharge, SaveTeletalkRechargeInStore saveTeletalkRechargeInstore, TeletalkMobileRecharge teletalkMobileRecharge, UpdateTeletalkMobileRecharge updateTeletalkMobileRecharge, LoadTeletalkMobileRecharge loadTeletalkMobileRecharge) {
         this.mapper = mapper;
         this.saveTeletalkRechargeInstore = saveTeletalkRechargeInstore;
@@ -46,11 +46,12 @@ public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUse
       this.updateTeletalkMobileRecharge = updateTeletalkMobileRecharge;
       this.loadTeletalkMobileRecharge = loadTeletalkMobileRecharge;
   }
+*/
 
 
 
 
-    @Override
+   /* @Override
     public Mono<RechargeResponse> recharge(RechargeRequest request) throws ExceptionHandlerUtil {
         log.info("Request Received for Banglalink Mobile Recharge");
         TeletalkRecharge teletalkRecharge = mapRechargeRequestToDomain(request).block();
@@ -69,7 +70,7 @@ public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUse
                     }
                     try {
                         if (!teletalkRecharge.isSameRequestWithinTimeBound(
-                                teletalkRechargeTransactionListByMobileNoAndAmount(teletalkRecharge.getMobileNo(), teletalkRecharge.getAmount()))) {
+                                teletalkRechargeTransactionListByMobileNoAndAmount(teletalkRecharge.getMobileNo(), teletalkRecharge.getAmount())).block()) {
                             log.error("Request received within 0.02 minute for requestId: {}", teletalkRecharge.getOriginatorConversationId());
                             saveTeletalkRechargeRequest.setTransStatus(PRE_PROCESS_FAILED);
                             return updateTeletalkMobileRecharge.updateState(saveTeletalkRechargeRequest)
@@ -84,7 +85,7 @@ public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUse
                     try {
                         return updateTeletalkMobileRecharge.updateState(saveTeletalkRechargeRequest)
                                 .flatMap(saveMobileRechargeTransactionPreProcessSate -> makeRechargeCall(teletalkRecharge)
-                                        .flatMap(response -> checkResponseStatusUpdateDomain(response, saveMobileRechargeTransactionPreProcessSate)
+                                        .flatMap(response -> checkResponseStatusUpdateDomain(response,saveMobileRechargeTransactionPreProcessSate)
                                                 .flatMap(updatedRechargeResponseStateUpdatedIntoDomain -> {
                                                     log.info("updatedRechargeResponseStateUpdatedIntoDomain - {}", updatedRechargeResponseStateUpdatedIntoDomain);
                                                     Mono<RechargeResponse> rechargeResponseMono = null;
@@ -92,16 +93,16 @@ public class TeletalkMobileRechargeService  implements TeletalkMobileRechargeUse
                                                         rechargeResponseMono = updateTeletalkMobileRecharge.updateState(updatedRechargeResponseStateUpdatedIntoDomain)
                                                                 .thenReturn(response);
                                                     } catch (ExceptionHandlerUtil e) {
-                                                        throw new RuntimeException(e);
+                                                        System.out.println(e.getLocalizedMessage());
                                                     }
                                                     return rechargeResponseMono;
                                                 })));
                     } catch (ExceptionHandlerUtil e) {
                        System.out.println(e.getLocalizedMessage());
                     }
-                    return response;
+                    return rechargeResponseMono;
                 });
-    }
+    }*/
 
 
 
@@ -123,8 +124,15 @@ public Mono<RechargeResponse> recharge(RechargeRequest request) throws Exception
                     }
                 }
                 try {
+                    //if (!teletalkRecharge.isSameRequestWithinTimeBound(
+                    //                                teletalkRechargeTransactionListByMobileNoAndAmount(teletalkRecharge.getMobileNo(), teletalkRecharge.getAmount())).block()) {
+                    //                            log.error("Request received within 0.02 minute for requestId: {}", teletalkRecharge.getOriginatorConversationId());
+                    //                            saveTeletalkRechargeRequest.setTransStatus(PRE_PROCESS_FAILED);
+
                     if (!teletalkRecharge.isSameRequestWithinTimeBound(
-                            teletalkRechargeTransactionListByMobileNoAndAmount(teletalkRecharge.getMobileNo(), teletalkRecharge.getAmount()).block())) {
+                            teletalkRechargeTransactionListByMobileNoAndAmount(teletalkRecharge.getMobileNo(), teletalkRecharge.getAmount())).block()) {
+
+
                         log.error("Request received within 0.02 minute for requestId: {}", teletalkRecharge.getOriginatorConversationId());
                         saveTeletalkRechargeRequest.setTransStatus(PRE_PROCESS_FAILED);
                         try {
@@ -137,9 +145,9 @@ public Mono<RechargeResponse> recharge(RechargeRequest request) throws Exception
                 } catch (ExceptionHandlerUtil e) {
                     return reactor.core.publisher.Flux.error(new RuntimeException(e));
                 }
-                log.info("Recharge amount and Time validation successful for Banglalink mobile recharge");
+                log.info("Recharge amount and Time validation successful for Teletalk mobile recharge");
                 saveTeletalkRechargeRequest.setTransStatus(PRE_PROCESS);
-                log.info("Pre-processing stage is saving for Banglalink Mobile Recharge");
+                log.info("Pre-processing stage is saving for Teletalk Mobile Recharge");
                 try {
                     return updateTeletalkMobileRecharge.updateState(saveTeletalkRechargeRequest)
                             .flatMap(saveMobileRechargeTransactionPreProcessSate -> makeRechargeCall(teletalkRecharge)
@@ -157,9 +165,6 @@ public Mono<RechargeResponse> recharge(RechargeRequest request) throws Exception
                 }
             });
 }
-
-
-
 
     private Mono<TeletalkRecharge> mapRechargeRequestToDomain(RechargeRequest rechargeRequest) {
         return Mono.fromCallable(() -> {
@@ -197,6 +202,25 @@ public Mono<RechargeResponse> recharge(RechargeRequest request) throws Exception
                 .onErrorMap(e -> new ExceptionHandlerUtil(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage())).block();
     }
 
+/*    private Mono<TeletalkRecharge> checkResponseStatusUpdateDomain(Mono<RechargeResponse> responseMono, TeletalkRecharge teletalkRecharge) {
+        return responseMono.flatMap(response -> {
+            log.info("Checking teletalk mobile recharge response {}", response);
+            if (response.getStatus().equalsIgnoreCase(OK)) {
+                teletalkRecharge.setTransStatus(OK);
+                teletalkRecharge.setTelatalkTransactionId(response.getTransactionId());
+                teletalkRecharge.setTeletalkTransactionDate((Timestamp.valueOf(LocalDateTime.now())));
+                teletalkRecharge.getIntermediateStatus().setIsRequestProcessSuccessful(true);
+            } else {
+                teletalkRecharge.setTransStatus(FAILED);
+                teletalkRecharge.getIntermediateStatus().setIsRequestProcessFailed(true);
+                teletalkRecharge.setErrorCode(response.getErrorCode());
+                teletalkRecharge.setErrorMessage(response.getErrorMessage());
+            }
+            log.info("Checking Mapped TeletalkMobileRechargeResponse into RechargeResponse{}", teletalkRecharge);
+            return Mono.just(teletalkRecharge);
+        });
+    }*/
+
     private Mono<TeletalkRecharge> checkResponseStatusUpdateDomain(Mono<RechargeResponse> responseMono, TeletalkRecharge teletalkRecharge) {
         return responseMono.flatMap(response -> {
             log.info("Checking teletalk mobile recharge response {}", response);
@@ -211,12 +235,10 @@ public Mono<RechargeResponse> recharge(RechargeRequest request) throws Exception
                 teletalkRecharge.setErrorCode(response.getErrorCode());
                 teletalkRecharge.setErrorMessage(response.getErrorMessage());
             }
-            log.info("Checking Mapped BanglalinkMobileRechargeResponse into RechargeResponse{}", teletalkRecharge);
+            log.info("Checking Mapped TeletalkMobileRechargeResponse into RechargeResponse{}", teletalkRecharge);
             return Mono.just(teletalkRecharge);
         });
     }
-
-
 
 
 

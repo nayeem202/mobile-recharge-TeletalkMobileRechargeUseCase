@@ -1,5 +1,4 @@
 package net.celloscope.bill.mobileRecharge.application.port.in.dto;
-
 import com.google.gson.GsonBuilder;
 import lombok.*;
 
